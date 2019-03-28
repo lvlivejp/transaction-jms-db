@@ -1,0 +1,29 @@
+
+spring:
+  activemq:
+    broker-url: failover:(tcp://10.10.13.141:61616,tcp://10.10.13.142:61616,tcp://10.10.13.143:61616)?initialReconnectDelay=100
+    user: szrsystem
+    password: szr2016
+    in-memory: false
+    pool:
+      enabled: false
+  jms:
+    listener:
+      concurrency: 1
+
+  datasource:
+    username: djzxcs
+    password: abc@1234
+    url: jdbc:mysql://10.10.8.101:3306/djzx_cs
+
+mybatis:
+  type-aliases-package: com.example.transactionjms.model
+  mapper-locations: classpath:mapper/*.xml
+  configuration:
+    map-underscore-to-camel-case: true
+
+logging:
+  level:
+    org.apache.activemq.transport.failover.FailoverTransport: error
+server:
+  port: 9999
