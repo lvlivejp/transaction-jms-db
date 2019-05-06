@@ -33,6 +33,8 @@ public class JmsController {
 
     @Autowired
     AdminMessageService adminMessageService;
+
+
     @RequestMapping("/send/{id}")
     public UserDto sendMq(@PathVariable String id){
         UserDto userDto= new UserDto();
@@ -53,6 +55,7 @@ public class JmsController {
 
     @RequestMapping("/send3/{id}")
     public AdminMessage sendMq3(@PathVariable String id){
+        log.info("*******进入请求");
         AdminMessage adminMessage = new AdminMessage();
         adminMessage.setId(Long.valueOf(id));
         adminMessage.setCtime(new Date());

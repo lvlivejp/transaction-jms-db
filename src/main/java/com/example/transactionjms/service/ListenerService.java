@@ -19,6 +19,11 @@ public class ListenerService {
     @Autowired
     AdminMessageService adminMessageService;
 
+    /**
+     * id为9时，抛出异常，如果factory.setTransactionManager(platformTransactionManager);
+     * 则数据库事务回滚，否则数据库提交
+     * @param userDto
+     */
     @JmsListener(destination = "testQueue1")
     public void receiveMessage(UserDto userDto) {
         log.info("接收到消息{}",userDto);

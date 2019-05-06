@@ -38,9 +38,9 @@ public class AdminMessageService {
         userDto.setName("name"+adminMessage.getId());
         jmsMessagingTemplate.convertAndSend(queue2,userDto);
 
-//        if(adminMessage.getId() == 9){
-//            throw new RuntimeException("db error");
-//        }
+        if(adminMessage.getId() == 8){
+            throw new RuntimeException("db error");
+        }
     }
 
 }

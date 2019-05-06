@@ -2,6 +2,7 @@ package com.example.transactionjms.config;
 
 import org.apache.activemq.command.ActiveMQQueue;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -24,6 +25,9 @@ public class ActiveMqConfig {
     @Autowired
     PlatformTransactionManager platformTransactionManager;
 
+    @Value(value = "${jms-transaction}")
+    private boolean jmsTransaction;
+
     @Bean
     @ConfigurationProperties("spring.jms.listener")
     public DefaultJmsListenerContainerFactory jmsListenerContainerFactory(ConnectionFactory connectionFactory) {
@@ -31,9 +35,9 @@ public class ActiveMqConfig {
         factory.setConnectionFactory(connectionFactory);
         /**
          * 设置为true时，当消息消费失败后，会告诉mq服务器该消息没有消费成功，会继续投递N次。（N为配置次数）
-         * 设置为false时，失败后不再进行重复投递。
+         * 设置为false时，失败后不再进行重复投递。Listener消费消息时，发送jms事务也失效。
          */
-        factory.setSessionTransacted(true);
+        factory.setSessionTransacted(false);
         /**
          * 发送时自动将JavaBean转成json格式
          * 接收时自动将json格式转为JavaBean
@@ -58,15 +62,20 @@ public class ActiveMqConfig {
 
 
     @Bean
-    public JmsTemplate jmsTemplate(ConnectionFactory connectionFactory){
+    public JmsMessagingTemplate jmsMessagingTemplate(ConnectionFactory connectionFactory){
         JmsTemplate jmsTemplate= new JmsTemplate(connectionFactory);
         /**
          * 发送消息和数据的事务绑定，一同提交或回滚
          * 性能几乎没影响
+         *
+         * 如果jmslistener中SessionTransacted配置为false，
+         * listener中该事务不起效，发生异常后，仍然发送成功。
+         *
+         * 如果是web请求发生异常，事务生效，不会发送成功。
          */
-        jmsTemplate.setSessionTransacted(true);
+        jmsTemplate.setSessionTransacted(jmsTransaction);
         jmsTemplate.setMessageConverter(jacksonJmsMessageConverter());
-        return jmsTemplate;
+        return new JmsMessagingTemplate(jmsTemplate);
     }
     @Bean("testQueue1")
     public Queue testQueue1(){

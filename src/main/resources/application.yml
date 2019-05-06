@@ -27,3 +27,5 @@ logging:
     org.apache.activemq.transport.failover.FailoverTransport: error
 server:
   port: 9999
+
+jms-transaction: true
